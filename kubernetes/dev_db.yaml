@@ -29,6 +29,10 @@ spec:
       labels:
         app: postgres
     spec:
+      volumes:
+      - name: postgres-pv-storage
+        persistentVolumeClaim:
+          claimName: postgres-pv-claim
       containers:
       - name: postgres
         image: postgres:latest
@@ -40,3 +44,33 @@ spec:
         ports:
         - name: tcp
           containerPort: 5432
+        volumeMounts:
+        - mountPath: "/var/lib/postgresql/data"
+          name: postgres-pv-storage
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/postgres"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pv-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
