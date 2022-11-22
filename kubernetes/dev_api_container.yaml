@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tt-track
+  labels:
+    app: tt-track
+spec:
+  ports:
+  - name: http
+    port: 9090
+    targetPort: 8080
+  selector:
+    app: tt-track
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tt-track
+  labels:
+    app: tt-track
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tt-track
+  template:
+    metadata:
+      labels:
+        app: tt-track
+    spec:
+      containers:
+      - name: tt-track
+        imagePullPolicy: Never
+        image: tt_track:latest
+        ports:
+        - name: http
+          containerPort: 8080
